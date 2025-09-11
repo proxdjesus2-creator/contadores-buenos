@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generador Cuenta Particular</title>
+<style>
+:root{
+  --bg:#f2f2f2;
+  --card:#ffffff;
+  --text:#111;
+  --muted:#666;
+  --border:#ccc;
+  --accent-green:#4CAF50;
+  --accent-blue:#2196F3;
+  --accent-red:#f44336;
+  --accent-orange:#ff9800;
+  --btn-ghost:#eee;
+}
+body {
+  font-family: Arial, sans-serif;
+  margin:0;
+  background-color:var(--bg);
+  color:var(--text);
+  transition: all 0.3s;
+}
+.container{max-width:700px;margin:auto;padding:15px;}
+input, button { padding:10px;margin:5px 0; width:100%; box-sizing:border-box; border-radius:5px; border:1px solid var(--border); transition:0.3s;}
+button { cursor:pointer; transition:0.3s ease; font-weight:600; }
+
+/* --- Botones --- */
+#modoOscuro { background-color:#0099cc; color:white; margin-bottom:10px; width:50%; padding:8px; font-size:14px; border-radius:6px; }
+#agregar{background-color:var(--accent-green);color:white;} 
+#agregar:hover{background-color:#45a049;}
+#generar{background-color:var(--accent-blue);color:white;} 
+#generar:hover{background-color:#0b7dda;}
+#borrar{background-color:var(--accent-red);color:white;} 
+#borrar:hover{background-color:#da190b;}
+#ayudaBtn{background-color:var(--accent-orange);color:white;} 
+#ayudaBtn:hover{background-color:#e68900;}
+
+/* --- Partidas --- */
+.partida{
+  background-color:var(--card);
+  border:2px solid var(--accent-green);
+  border-radius:8px;
+  padding:15px;
+  margin-top:15px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.1);
+  transform: scale(0);
+  animation:aparecer 0.4s forwards;
+}
+@keyframes aparecer{to{transform:scale(1);}}
+.row{display:flex; justify-content:space-between; margin:2px 0; border-bottom:1px dashed var(--border); padding:2px 0;}
+.col1{flex:2;}
+.col2,.col3{flex:1; text-align:right;}
+#ayuda{background-color:#e7f3fe;border-left:6px solid var(--accent-blue);padding:10px;margin-top:10px;border-radius:5px; display:none;}
+footer{text-align:center;margin-top:20px;font-size:14px;color:var(--muted);padding-bottom:10px;}
+
+/* --- Modo oscuro mejorado estilo anterior --- */
+body.dark{
+  --bg:#0f1113;
+  --card:#1e2a38;
+  --text:#e7eef0;
+  --muted:#a0cce6;
+  --border:#4f667a;
+}
+body.dark { background-color:var(--bg); color:var(--text);}
+body.dark input, body.dark select{ background-color:#22334d; color:var(--text); border:1px solid #4f667a; }
+body.dark .partida{ background-color:var(--card); border-color:#81c784; box-shadow:0 4px 15px rgba(0,0,0,0.6);}
+body.dark #modoOscuro{ background-color:#00bfff; color:#111; font-weight:700;}
+body.dark #ayuda{ background-color:#1c2a3a; border-left:6px solid #00bfff; color:#e7eef0;}
+body.dark button:hover{opacity:0.85;}
+</style>
+</head>
+<body>
+<div class="container">
+
+<button id="modoOscuro" onclick="cambiarModo()">Modo Oscuro</button>
+
+<h2>Generador Cuenta Particular</h2>
+
+<label>Nombre del Socio:</label>
+<input type="text" id="socio" placeholder="Ej: Gómez">
+
+<label>Monto del préstamo:</label>
+<input type="number" id="prestamo" placeholder="75000">
+
+<label>Abono mensual:</label>
+<input type="number" id="abono" placeholder="Monto" onkeypress="enterAgregar(event)">
+
+<label>Tasa de interés mensual (%):</label>
+<input type="number" id="interes" placeholder="1.5" step="0.01">
+
+<button id="agregar" onclick="agregarAbono()">Agregar Abono</button>
+<div id="listaAbonos"></div>
+
+<button id="generar" onclick="generarPartidas()">Generar Partidas</button>
+<button id="borrar" onclick="borrarPartidas()">Borrar Partidas</button>
+
+
+
+<div id="partidasGeneradas"></div>
+
+<footer>Pagina creada por yo? | Derechos reservados</footer>
+
+<script>
+let abonos=[];
+
+const nombresAbonos = ["Primer", "Segundo", "Tercer", "Cuarto", "Quinto", "Sexto", "Séptimo", "Octavo", "Noveno", "Décimo"];
+
+function enterAgregar(e){ if(e.key==='Enter'){ agregarAbono(); } }
+'Socio X';
+  let saldo=parseFloat(document.getElementById('prestamo').value);
+  const tasa=parseFloat
+    const total=abono+interesMes;
+    const abonoNombre = nombresAbonos[index] || `Abono ${index+1}`;
+ent.getElementById('interes').value)/100||0;
+  const contenedor=document.getElementById('partidasGeneradas');
+  contenedor.innerHTML='';
+  if(saldo<=0 || abonos.length===0){ alert('Completa los campos'); return; }
+
+  abonos.forEach((abono,index)=>{
+    if(saldo<=0) return;
+    const interesMes=saldo*tasa; 
+    div.className='partida';
+    div.innerHTML = `
+<div class="row"><div class="col1">Caja/Bancos</div><div class="col2">${total.toFixed(2)}</div><div class="col3"></div></div>
+<div class="row"><div class="col1">a: Cuenta Particular Socio ${socio}</div><div class="col2"></div><div class="col3">${abono.toFixed(2)}</div></div>
+<div class="row"><div class="col1">a: Interés Producto</div><div class="col2"></div><div class="col3">${interesMes.toFixed(2)}</div></div>
+<div class="row"><div class="col1"><strong>Registro del ${abonoNombre} abono con interés del ${(tasa*100).toFixed(2)}% mensual sobre saldo</strong></div><div class="col2"><strong>${total.toFixed(2)}</strong></div><div class="col3"></div></div>
+`;
+
+    contenedor.appendChild(div);
+    saldo -= abono;
+  });
+}
+
+function borrarPartidas(){
+  document.getElementById('partidasGeneradas').innerHTML='';
+  abonos=[];
+  document.getElementById('listaAbonos').innerHTML='';
+  alert('Se borraron todas las partidas.');
+}
+
+function cambiarModo(){
+  document.body.classList.toggle('dark');
+  document.getElementById('modoOscuro').innerText=document.body.classList.contains('dark')?'Modo Claro':'Modo Oscuro';
+}
+
+function toggleAyuda(){
+  const ayuda=document.getElementById('ayuda');
+  ayuda.style.display=(ayuda.style.display==='none' || ayuda.style.display==='')?'block':'none';
+}
+</script>
+</body>
+</html>
