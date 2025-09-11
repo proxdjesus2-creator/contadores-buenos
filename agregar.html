@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Solicitud de Agregar Más</title>
+<style>
+:root{
+  --bg:#f2f2f2;
+  --card:#ffffff;
+  --text:#111;
+  --accent:#2196F3;
+  --btn-color:#4CAF50;
+  --border:#ccc;
+}
+
+body{
+  font-family: Arial, sans-serif;
+  margin:0;
+  background-color:var(--bg);
+  color:var(--text);
+  transition:0.3s;
+}
+.container{
+  max-width:600px;
+  margin:50px auto;
+  padding:20px;
+  background-color:var(--card);
+  border-radius:10px;
+  box-shadow:0 6px 18px rgba(0,0,0,0.1);
+}
+h2{color:var(--accent); text-align:center;}
+label{display:block; margin-top:15px; font-weight:600;}
+input, textarea{
+  width:100%;
+  padding:10px;
+  margin-top:5px;
+  border:1px solid var(--border);
+  border-radius:6px;
+  box-sizing:border-box;
+  font-size:14px;
+}
+textarea{resize:vertical; min-height:100px;}
+button{
+  margin-top:20px;
+  padding:12px 20px;
+  width:100%;
+  border:none;
+  border-radius:8px;
+  background-color:var(--btn-color);
+  color:white;
+  font-size:16px;
+  cursor:pointer;
+  font-weight:600;
+  transition:0.3s;
+}
+button:hover{opacity:0.85;}
+
+#modoOscuro{
+  background-color:#0099cc;
+  color:white;
+  margin-bottom:20px;
+  width:50%;
+  padding:10px;
+  font-size:16px;
+}
+body.dark{
+  background-color:#121212;
+  color:#f2f2f2;
+}
+body.dark .container{background-color:#1e2a38; color:#f2f2f2;}
+body.dark input, body.dark textarea{background-color:#2e2e2e; color:#f2f2f2; border:1px solid #555;}
+body.dark button{background-color:#00bfff;}
+</style>
+</head>
+<body>
+<div class="container">
+  <button id="modoOscuro" onclick="cambiarModo()">Modo Oscuro</button>
+  <h2>Solicitud para Agregar Más</h2>
+
+  <form id="solicitudForm" onsubmit="enviarSolicitud(event)">
+    <label for="nombre">Nombre:</label>
+    <input type="text" id="nombre" required placeholder="Tu nombre">
+
+    <label for="correo">Correo Electrónico:</label>
+    <input type="email" id="correo" required placeholder="tu@email.com">
+
+    <label for="mensaje">Qué quieres que agregue:</label>
+    <textarea id="mensaje" required placeholder="Escribe aquí tu solicitud"></textarea>
+
+    <button type="submit">Enviar Solicitud</button>
+  </form>
+</div>
+
+<script>
+function cambiarModo(){
+  document.body.classList.toggle('dark');
+  document.getElementById('modoOscuro').innerText=document.body.classList.contains('dark')?'Modo Claro':'Modo Oscuro';
+}
+
+function enviarSolicitud(e){
+  e.preventDefault();
+  const nombre = document.getElementById('nombre').value;
+  const correo = document.getElementById('correo').value;
+  const mensaje = document.getElementById('mensaje').value;
+
+  // abrir correo del usuario con mailto
+  const asunto = encodeURIComponent("Solicitud de agregar más");
+  const cuerpo = encodeURIComponent(`Nombre: ${nombre}\nCorreo: ${correo}\nSolicitud: ${mensaje}`);
+  window.location.href = `mailto:tienrique677@gmail.com?subject=${asunto}&body=${cuerpo}`;
+}
+</script>
+</body>
+</html>
