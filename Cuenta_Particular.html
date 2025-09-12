@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Generador Cuenta Particular</title>
+<title>Generador Cuenta Particular - Final Correcto</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
 <style>
 :root{
   --bg:#f2f2f2;
@@ -15,31 +17,49 @@
   --accent-blue:#2196F3;
   --accent-red:#f44336;
   --accent-orange:#ff9800;
-  --btn-ghost:#eee;
 }
-body {
+body{
   font-family: Arial, sans-serif;
   margin:0;
   background-color:var(--bg);
   color:var(--text);
   transition: all 0.3s;
 }
-.container{max-width:700px;margin:auto;padding:15px;}
-input, button { padding:10px;margin:5px 0; width:100%; box-sizing:border-box; border-radius:5px; border:1px solid var(--border); transition:0.3s;}
-button { cursor:pointer; transition:0.3s ease; font-weight:600; }
-
-/* --- Botones --- */
-#modoOscuro { background-color:#0099cc; color:white; margin-bottom:10px; width:50%; padding:8px; font-size:14px; border-radius:6px; }
-#agregar{background-color:var(--accent-green);color:white;} 
-#agregar:hover{background-color:#45a049;}
-#generar{background-color:var(--accent-blue);color:white;} 
-#generar:hover{background-color:#0b7dda;}
-#borrar{background-color:var(--accent-red);color:white;} 
-#borrar:hover{background-color:#da190b;}
-#ayudaBtn{background-color:var(--accent-orange);color:white;} 
-#ayudaBtn:hover{background-color:#e68900;}
-
-/* --- Partidas --- */
+.container{
+  max-width:900px;
+  margin:auto;
+  padding:20px;
+}
+input, select, button{
+  padding:10px;
+  margin:5px 0;
+  width:100%;
+  box-sizing:border-box;
+  border-radius:5px;
+  border:1px solid var(--border);
+  transition:0.3s;
+}
+input::placeholder { color: transparent; }
+button{
+  cursor:pointer;
+  font-weight:600;
+}
+.card{
+  background-color:var(--card);
+  border-radius:10px;
+  padding:15px;
+  margin-top:15px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.1);
+}
+.row-buttons{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:10px;
+}
+.btn-primary{background-color:var(--accent-blue);color:white;}
+.btn-warning{background-color:var(--accent-orange);color:white;}
+.btn-danger{background-color:var(--accent-red);color:white;}
 .partida{
   background-color:var(--card);
   border:2px solid var(--accent-green);
@@ -47,110 +67,190 @@ button { cursor:pointer; transition:0.3s ease; font-weight:600; }
   padding:15px;
   margin-top:15px;
   box-shadow:0 4px 12px rgba(0,0,0,0.1);
-  transform: scale(0);
-  animation:aparecer 0.4s forwards;
 }
-@keyframes aparecer{to{transform:scale(1);}}
-.row{display:flex; justify-content:space-between; margin:2px 0; border-bottom:1px dashed var(--border); padding:2px 0;}
-.col1{flex:2;}
-.col2,.col3{flex:1; text-align:right;}
-#ayuda{background-color:#e7f3fe;border-left:6px solid var(--accent-blue);padding:10px;margin-top:10px;border-radius:5px; display:none;}
-footer{text-align:center;margin-top:20px;font-size:14px;color:var(--muted);padding-bottom:10px;}
-
-/* --- Modo oscuro mejorado estilo anterior --- */
+.partida h3{
+  margin-top:0;
+  color:var(--accent-blue);
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:8px;
+}
+th, td{
+  border:1px solid var(--border);
+  padding:8px;
+}
+th{background:#fafafa;}
+.debe{text-align:right;width:120px;}
+.haber{text-align:right;width:120px;}
+.nota{
+  font-style:italic;
+  color:var(--muted);
+  text-align:center;
+  margin-top:5px;
+}
+footer{
+  text-align:center;
+  margin-top:20px;
+  font-size:14px;
+  color:var(--muted);
+  padding-bottom:10px;
+}
+/* Modo oscuro mejorado */
 body.dark{
-  --bg:#0f1113;
-  --card:#1e2a38;
-  --text:#e7eef0;
-  --muted:#a0cce6;
-  --border:#4f667a;
+  --bg:#121212;
+  --card:#1e1e1e;
+  --text:#00b9ee;
+  --muted:#8ab4f8;
+  --border:#333;
 }
-body.dark { background-color:var(--bg); color:var(--text);}
-body.dark input, body.dark select{ background-color:#22334d; color:var(--text); border:1px solid #4f667a; }
-body.dark .partida{ background-color:var(--card); border-color:#81c784; box-shadow:0 4px 15px rgba(0,0,0,0.6);}
-body.dark #modoOscuro{ background-color:#00bfff; color:#111; font-weight:700;}
-body.dark #ayuda{ background-color:#1c2a3a; border-left:6px solid #00bfff; color:#e7eef0;}
+body.dark{background-color:var(--bg); color:var(--text);}
+body.dark input, body.dark select{
+  background-color:#1e1e1e;
+  color:var(--text);
+  border:1px solid #444;
+}
+body.dark .card{background-color:var(--card);border-color:#0bad12;box-shadow:0 4px 15px rgba(0,0,0,0.6);}
+body.dark .partida{background-color:#1e1e1e;border-color:#4caf50;box-shadow:0 4px 12px rgba(0,0,0,0.5);}
+body.dark th{background:#2c2c2c;color:var(--text);}
+body.dark td{color:var(--text);}
 body.dark button:hover{opacity:0.85;}
 </style>
 </head>
 <body>
 <div class="container">
+  <button id="modoOscuro" onclick="cambiarModo()">Modo Oscuro</button>
+  <h2>Generador Cuenta Particular</h2>
 
-<button id="modoOscuro" onclick="cambiarModo()">Modo Oscuro</button>
+  <div class="card">
+    <label>Escenario:</label>
+    <select id="escenario">
+      <option value="empresa">Empresa presta al socio</option>
+      <option value="socio">Socio presta a la empresa</option>
+    </select>
 
-<h2>Generador Cuenta Particular</h2>
+    <label>Nombre del socio:</label>
+    <input type="text" id="socio">
 
-<label>Nombre del Socio:</label>
-<input type="text" id="socio" placeholder="Ej: Gómez">
+    <label>Monto del préstamo:</label>
+    <input type="number" id="monto">
 
-<label>Monto del préstamo:</label>
-<input type="number" id="prestamo" placeholder="75000">
+    <label>Tasa de interés mensual (%):</label>
+    <input type="number" id="tasa" step="0.01">
 
-<label>Abono mensual:</label>
-<input type="number" id="abono" placeholder="Monto" onkeypress="enterAgregar(event)">
+    <label>Abono:</label>
+    <input type="number" id="abono">
 
-<label>Tasa de interés mensual (%):</label>
-<input type="number" id="interes" placeholder="1.5" step="0.01">
+    <label>Repeticiones:</label>
+    <input type="number" id="reps" value="1">
 
-<button id="agregar" onclick="agregarAbono()">Agregar Abono</button>
-<div id="listaAbonos"></div>
+    <div class="row-buttons">
+      <button class="btn-primary" onclick="agregarAbonos()">Agregar Abonos</button>
+      <button class="btn-primary" onclick="generarPartidas()">Generar Partidas</button>
+      <button class="btn-warning" onclick="descargarPDF()">Descargar PDF</button>
+      <button class="btn-danger" onclick="resetear()">Borrar Todo</button>
+    </div>
 
-<button id="generar" onclick="generarPartidas()">Generar Partidas</button>
-<button id="borrar" onclick="borrarPartidas()">Borrar Partidas</button>
+    <div id="salida"></div>
+  </div>
 
-
-
-<div id="partidasGeneradas"></div>
-
-<footer>Pagina creada por yo? | Derechos reservados</footer>
+  <footer>Pagina creada por yo? | Derechos reservados</footer>
+</div>
 
 <script>
 let abonos=[];
 
-const nombresAbonos = ["Primer", "Segundo", "Tercer", "Cuarto", "Quinto", "Sexto", "Séptimo", "Octavo", "Noveno", "Décimo"];
+function agregarAbonos(){
+  const abono=parseFloat(document.getElementById('abono').value);
+  const reps=parseInt(document.getElementById('reps').value)||1;
+  for(let i=0;i<reps;i++) abonos.push(abono);
+  alert(reps+" abono(s) de "+abono+" agregado(s).");
+}
 
-function enterAgregar(e){ if(e.key==='Enter'){ agregarAbono(); } }
-'Socio X';
-  let saldo=parseFloat(document.getElementById('prestamo').value);
-  const tasa=parseFloat
-    const total=abono+interesMes;
-    const abonoNombre = nombresAbonos[index] || `Abono ${index+1}`;
-ent.getElementById('interes').value)/100||0;
-  const contenedor=document.getElementById('partidasGeneradas');
-  contenedor.innerHTML='';
-  if(saldo<=0 || abonos.length===0){ alert('Completa los campos'); return; }
+function ordinal(n){
+  const ords=["primer","segundo","tercer","cuarto","quinto","sexto","séptimo","octavo","noveno","décimo"];
+  return ords[n-1]|| (n+"°");
+}
 
-  abonos.forEach((abono,index)=>{
+function generarPartidas(){
+  const salida=document.getElementById('salida');
+  salida.innerHTML="";
+  const escenario=document.getElementById('escenario').value;
+  const tasa=parseFloat(document.getElementById('tasa').value)/100;
+  const socio=document.getElementById('socio').value||'X';
+  let saldo=parseFloat(document.getElementById('monto').value);
+
+  abonos.forEach((abono,i)=>{
     if(saldo<=0) return;
-    const interesMes=saldo*tasa; 
+    const interes=saldo*tasa;
+    const pago=Math.min(abono,saldo);
+    const total=pago+interes;
+    const div=document.createElement('div');
     div.className='partida';
-    div.innerHTML = `
-<div class="row"><div class="col1">Caja/Bancos</div><div class="col2">${total.toFixed(2)}</div><div class="col3"></div></div>
-<div class="row"><div class="col1">a: Cuenta Particular Socio ${socio}</div><div class="col2"></div><div class="col3">${abono.toFixed(2)}</div></div>
-<div class="row"><div class="col1">a: Interés Producto</div><div class="col2"></div><div class="col3">${interesMes.toFixed(2)}</div></div>
-<div class="row"><div class="col1"><strong>Registro del ${abonoNombre} abono con interés del ${(tasa*100).toFixed(2)}% mensual sobre saldo</strong></div><div class="col2"><strong>${total.toFixed(2)}</strong></div><div class="col3"></div></div>
-`;
+    div.innerHTML=`<h3>Partida ${i+1}</h3>`;
 
-    contenedor.appendChild(div);
-    saldo -= abono;
+    let tabla=`<table><tr><th>Cuenta</th><th class='debe'>Debe</th><th class='haber'>Haber</th></tr>`;
+    const notaFinal = `Registro del ${ordinal(i+1)} abono con interés del ${(tasa*100).toFixed(1)}%`;
+    if(escenario==='empresa'){
+      tabla+=`<tr><td>Caja/Bancos</td><td>${total.toFixed(2)}</td><td></td></tr>`;
+      tabla+=`<tr><td>a: Cuenta Particular Socio ${socio}</td><td></td><td>${pago.toFixed(2)}</td></tr>`;
+      tabla+=`<tr><td>a: Interés Producto</td><td></td><td>${interes.toFixed(2)}</td></tr>`;
+      tabla+=`<tr><td>${notaFinal}</td><td>${total.toFixed(2)}</td><td>${total.toFixed(2)}</td></tr>`;
+    }else{
+      tabla+=`<tr><td>Cuenta Particular Socio ${socio}</td><td>${pago.toFixed(2)}</td><td></td></tr>`;
+      tabla+=`<tr><td>Interés Gasto</td><td>${interes.toFixed(2)}</td><td></td></tr>`;
+      tabla+=`<tr><td>a: Caja/Bancos</td><td></td><td>${total.toFixed(2)}</td></tr>`;
+      tabla+=`<tr><td>${notaFinal}</td><td>${total.toFixed(2)}</td><td>${total.toFixed(2)}</td></tr>`;
+    }
+    tabla+=`</table>`;
+    div.innerHTML+=tabla;
+    salida.appendChild(div);
+
+    saldo-=pago;
   });
 }
 
-function borrarPartidas(){
-  document.getElementById('partidasGeneradas').innerHTML='';
-  abonos=[];
-  document.getElementById('listaAbonos').innerHTML='';
-  alert('Se borraron todas las partidas.');
-}
+function resetear(){ abonos=[]; document.getElementById('salida').innerHTML=''; }
 
-function cambiarModo(){
-  document.body.classList.toggle('dark');
-  document.getElementById('modoOscuro').innerText=document.body.classList.contains('dark')?'Modo Claro':'Modo Oscuro';
-}
+function cambiarModo(){ document.body.classList.toggle('dark'); document.getElementById('modoOscuro').innerText=document.body.classList.contains('dark')?'Modo Claro':'Modo Oscuro'; }
 
-function toggleAyuda(){
-  const ayuda=document.getElementById('ayuda');
-  ayuda.style.display=(ayuda.style.display==='none' || ayuda.style.display==='')?'block':'none';
+function descargarPDF(){
+  const { jsPDF }=window.jspdf;
+  const doc=new jsPDF();
+  let y=10;
+  doc.setFontSize(14); doc.text("Partidas Contables",105,y,null,null,'center'); y+=10;
+  const escenario=document.getElementById('escenario').value;
+  const tasa=parseFloat(document.getElementById('tasa').value)/100;
+  const socio=document.getElementById('socio').value||'X';
+  let saldo=parseFloat(document.getElementById('monto').value);
+
+  abonos.forEach((abono,i)=>{
+    if(saldo<=0) return;
+    const interes=saldo*tasa;
+    const pago=Math.min(abono,saldo);
+    const total=pago+interes;
+    const notaFinal = `Registro del ${ordinal(i+1)} abono con interés del ${(tasa*100).toFixed(1)}%`;
+
+    doc.setFontSize(12); doc.text(`Partida ${i+1}`,10,y); y+=6;
+    let body=[];
+    if(escenario==='empresa'){
+      body.push(["Caja/Bancos",total.toFixed(2),""]);
+      body.push([`a: Cuenta Particular Socio ${socio}`,"",pago.toFixed(2)]);
+      body.push(["a: Interés Producto","",interes.toFixed(2)]);
+      body.push([notaFinal,total.toFixed(2),total.toFixed(2)]);
+    }else{
+      body.push([`Cuenta Particular Socio ${socio}`,pago.toFixed(2),""]);
+      body.push(["Interés Gasto",interes.toFixed(2),""]);
+      body.push(["a: Caja/Bancos","",total.toFixed(2)]);
+      body.push([notaFinal,total.toFixed(2),total.toFixed(2)]);
+    }
+
+    doc.autoTable({startY:y,head:[["Cuenta","Debe","Haber"]],body:body,theme:'grid'});
+    y=doc.lastAutoTable.finalY+6;
+    saldo-=pago;
+  });
+  doc.save("partidas.pdf");
 }
 </script>
 </body>
