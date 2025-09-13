@@ -145,19 +145,28 @@ function crearCamposSocios(){
 }
 
 function calcularYGenerar(){
-  const gananciaAntes=Number(document.getElementById('gananciaAntes').value||0);
-  const porcISR=Number(document.getElementById('porcISR').value||25)/100;
-  const porcReserva=Number(document.getElementById('porcReserva').value||5)/100;
-  const medioPago=document.getElementById('medioPago').value;
-  const sociosInputs=document.querySelectorAll('#sociosList input');
+  const gananciaAntes = Number(document.getElementById('gananciaAntes').value||0);
+  const porcISR = Number(document.getElementById('porcISR').value||25)/100;
+  const porcReserva = Number(document.getElementById('porcReserva').value||5)/100;
+  const medioPago = document.getElementById('medioPago').value;
+  const sociosInputs = document.querySelectorAll('#sociosList input');
   socios=[];
   sociosInputs.forEach(inp=>socios.push({nombre:inp.value||inp.placeholder}));
 
   if(gananciaAntes<=0 || socios.length===0){alert('Ingresa valores válidos'); return;}
-  const montoISR=gananciaAntes*porcISR;
-  const montoReserva=gananciaAntes*porcReserva;
-  const gananciaNeta=gananciaAntes-montoISR-montoReserva;
-  const porSocio=gananciaNeta/socios.length;
+
+  // Paso 1: ISR sobre la ganancia antes
+  const montoISR = gananciaAntes * porcISR;
+  const baseDespuesISR = gananciaAntes - montoISR;
+
+  // Paso 2: Reserva sobre la base después de ISR
+  const montoReserva = baseDespuesISR * porcReserva;
+
+  // Paso 3: Ganancia neta después de ISR y reserva
+  const gananciaNeta = baseDespuesISR - montoReserva;
+
+  // Reparto entre socios
+  const porSocio = gananciaNeta / socios.length;
 
   const salida=document.getElementById('salida');
   salida.innerHTML='';
@@ -169,9 +178,9 @@ function calcularYGenerar(){
   part1.innerHTML=`<div class="part-title">Partida 1:</div>
     <div class="line"><div class="left">Ganancia antes de impuesto y reserva</div><div class="mid">${fmt(gananciaAntes)}</div><div class="right"></div></div>
     <div class="line"><div class="left">a: ISR por pagar (${(porcISR*100).toFixed(2)}%)</div><div class="mid"></div><div class="right">${fmt(montoISR)}</div></div>
-    <div class="line"><div class="left">a: Reserva legal (${(porcReserva*100).toFixed(2)}%)</div><div class="mid"></div><div class="right">${fmt(montoReserva)}</div></div>
+    <div class="line"><div class="left">a: Reserva legal (${(porcReserva*100).toFixed(2)}% sobre ${fmt(baseDespuesISR)})</div><div class="mid"></div><div class="right">${fmt(montoReserva)}</div></div>
     <div class="line no-border"><div class="left">a: Ganancia después de impuesto y reserva</div><div class="mid"></div><div class="right">${fmt(gananciaNeta)}</div></div>
-    <div class="line registro"><div class="left">Registro del cálculo de ISR y reserva legal según lo establece la ley</div><div class="mid">${fmt(totalDebe1)}</div><div class="right">${fmt(totalHaber1)}</div></div>`;
+    <div class="line registro"><div class="left">Registro del cálculo de ISR y reserva legal</div><div class="mid">${fmt(totalDebe1)}</div><div class="right">${fmt(totalHaber1)}</div></div>`;
   salida.appendChild(part1);
 
   // Partida 2
@@ -185,7 +194,7 @@ function calcularYGenerar(){
     row.innerHTML=`<div class="left">a: Cuenta beneficio socio ${s.nombre}</div><div class="mid"></div><div class="right">${fmt(porSocio)}</div>`;
     part2.appendChild(row);
   });
-  part2.innerHTML+=`<div class="line registro"><div class="left">Registro de la distribución de las ganancias a los ${socios.length} socios de la empresa</div><div class="mid">${fmt(totalDebe2)}</div><div class="right">${fmt(totalHaber2)}</div></div>`;
+  part2.innerHTML+=`<div class="line registro"><div class="left">Distribución entre ${socios.length} socios</div><div class="mid">${fmt(totalDebe2)}</div><div class="right">${fmt(totalHaber2)}</div></div>`;
   salida.appendChild(part2);
 
   // Partida 3
@@ -201,9 +210,10 @@ function calcularYGenerar(){
   const medioRow=document.createElement('div'); medioRow.className='line no-border';
   medioRow.innerHTML=`<div class="left">a: ${medioPago}</div><div class="mid"></div><div class="right">${fmt(totalHaber3)}</div>`;
   part3.appendChild(medioRow);
-  part3.innerHTML+=`<div class="line registro"><div class="left">Registro del pago de ganancias a los ${socios.length} socios de la empresa</div><div class="mid">${fmt(totalDebe3)}</div><div class="right">${fmt(totalHaber3)}</div></div>`;
+  part3.innerHTML+=`<div class="line registro"><div class="left">Pago de ganancias a los socios</div><div class="mid">${fmt(totalDebe3)}</div><div class="right">${fmt(totalHaber3)}</div></div>`;
   salida.appendChild(part3);
 }
+
 
 function toggleDark(){document.body.classList.toggle('dark');}
 function mostrarAyuda(){alert("Instrucciones:\n1. Ingresa la ganancia antes de impuestos y reserva.\n2. Ajusta ISR y Reserva legal si deseas.\n3. Ingresa el número de socios y pulsa Generar campos.\n4. Escribe el nombre de cada socio.\n5. Selecciona medio de pago.\n6. Pulsa Calcular y Generar Partidas.\n7. Pulsa Descargar PDF para obtener el archivo.");}
