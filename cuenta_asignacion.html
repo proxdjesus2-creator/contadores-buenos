@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cuenta Asignación - Los Contadores S.A.</title>
+<style>
+:root{
+  --bg:#f2f2f2;
+  --text:#111;
+  --accent:#2196F3;
+  --btn-bg:#2196F3;
+  --btn-color:#fff;
+  --header:#2196F3;
+}
+body{
+  font-family:'Segoe UI',Arial,sans-serif;
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  transition:0.3s;
+}
+header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:15px 25px;
+  background:var(--header);
+  color:#fff;
+}
+header h1{margin:0;font-size:24px;font-weight:800;}
+header button{
+  background:#fff;color:var(--header);
+  border:none;border-radius:50%;width:40px;height:40px;
+  font-size:20px;cursor:pointer;
+}
+.container{max-width:900px;margin:auto;padding:20px;}
+form{background:white;padding:20px;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,0.08);margin-bottom:20px;}
+form label{display:block;margin-top:10px;font-weight:600;}
+form input, form select{width:100%;padding:10px;margin-top:6px;border-radius:6px;border:1px solid #ccc;font-size:14px;}
+form button{margin-top:15px;padding:10px 16px;border:none;border-radius:8px;background:var(--btn-bg);color:var(--btn-color);font-weight:600;cursor:pointer;}
+table{width:100%;border-collapse:collapse;margin-top:20px;}
+table th, table td{border:1px solid #ccc;padding:8px;}
+table th{text-align:center;background:var(--accent);color:white;}
+.partida-header{background:#e6f2ff;font-weight:600;text-align:center;font-size:16px;}
+.repetidas{font-weight:bold;font-size:18px;color:#00c1e5;text-align:center;margin:15px 0;}
+body.dark-mode{
+  --bg:#000;
+  --text:#ffffff;
+  --accent:#00d8ff;
+  --btn-bg:#00d8ff;
+  --btn-color:#000;
+  --header:#00d8ff;
+}
+body.dark-mode form{background:rgba(24, 25, 25, 0.58);color:#00bdff;}
+body.dark-mode table th{background:#00d8ff;color:#000000;}
+body.dark-mode table td{border-color:#00d8ff;color:#f9f9f9;}
+#socios-container{margin-top:10px;}
+.socio-entry{display:flex;gap:10px;margin-top:8px;}
+.socio-entry input{flex:1;}
+.socio-entry button{flex:0;padding:0 8px;background:red;color:white;border:none;border-radius:4px;cursor:pointer;}
+.meses-container{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px;}
+.meses-container label{display:flex;align-items:center;gap:4px;}
+.action-buttons{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;}
+td.text-left{text-align:left;}
+td.text-right{text-align:right;}
+footer {
+  background: var(--header); /* Celeste consistente con tu tema */
+  color: #fff; /* Texto blanco */
+  text-align: center;
+  padding: 15px 0;
+  font-size: 14px;
+  font-weight: 600;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.2);
+  margin-top: 20px;
+  transition: 0.3s;
+}
+
+body.dark-mode footer {
+  background: #000; /* Negro para modo oscuro */
+  color: #00d8ff; /* Celeste para resaltar texto */
+  box-shadow: 0 -2px 8px rgba(255,255,255,0.2);
+}
+
+</style>
+</head>
+<body>
+<header>
+  <h1>Cuenta Asignación </h1>
+  <button id="darkBtn">🌙</button>
+</header>
+
+<div class="container">
+<form id="asignacionForm">
+  <label>Socios:</label>
+  <div id="socios-container"></div>
+  <button type="button" id="agregarSocioBtn">+ Agregar socio</button>
+
+  <label>Meses a repetir la Partida 1</label>
+  <div class="meses-container">
+    <label><input type="checkbox" value="1"> Enero</label>
+    <label><input type="checkbox" value="2"> Febrero</label>
+    <label><input type="checkbox" value="3"> Marzo</label>
+    <label><input type="checkbox" value="4"> Abril</label>
+    <label><input type="checkbox" value="5"> Mayo</label>
+    <label><input type="checkbox" value="6"> Junio</label>
+    <label><input type="checkbox" value="7"> Julio</label>
+    <label><input type="checkbox" value="8"> Agosto</label>
+    <label><input type="checkbox" value="9"> Septiembre</label>
+    <label><input type="checkbox" value="10"> Octubre</label>
+    <label><input type="checkbox" value="11"> Noviembre</label>
+    <label><input type="checkbox" value="12"> Diciembre</label>
+  </div>
+  <label>O indicar número de meses</label>
+  <input type="number" id="numMeses" min="1" max="12" placeholder="Ej: 3">
+
+  <label>Ganancia antes de impuesto y reserva (Q)</label>
+  <input type="number" id="gananciaBruta" placeholder="Ej: 100000" required>
+
+  <label>Porcentaje ISR (%)</label>
+  <input type="number" id="porcISR" min="0" max="100" placeholder="25" value="25">
+
+  <label>Porcentaje Reserva (%)</label>
+  <input type="number" id="porcReserva" min="0" max="100" placeholder="5" value="5">
+
+  <div class="action-buttons">
+    <button type="submit">Generar partidas</button>
+    <button type="button" id="borrarBtn">Borrar todo</button>
+    <button type="button" id="pdfBtn">Descargar PDF</button>
+  </div>
+</form>
+
+<div id="partidasContainer"></div>
+</div>
+<footer>
+  Pagina credad por yo? | Derechos reservados
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+// Modo oscuro
+document.getElementById('darkBtn').addEventListener('click',()=>{
+  document.body.classList.toggle('dark-mode');
+  document.getElementById('darkBtn').textContent=document.body.classList.contains('dark-mode')?"☀️":"🌙";
+});
+
+// Agregar socio
+const sociosContainer=document.getElementById('socios-container');
+document.getElementById('agregarSocioBtn').addEventListener('click',()=>{
+  const div=document.createElement('div');
+  div.classList.add('socio-entry');
+  div.innerHTML=`<input type="text" class="socioInput" placeholder="Nombre socio" required>
+  <input type="number" class="montoInput" placeholder="Monto Q" required>
+  <button type="button" class="removeBtn">X</button>`;
+  sociosContainer.appendChild(div);
+  div.querySelector('.removeBtn').addEventListener('click',()=>sociosContainer.removeChild(div));
+});
+
+// Borrar todo
+document.getElementById('borrarBtn').addEventListener('click',()=>{
+  sociosContainer.innerHTML='';
+  document.getElementById('partidasContainer').innerHTML='';
+  document.getElementById('numMeses').value='';
+  document.getElementById('gananciaBruta').value='';
+  document.getElementById('porcISR').value=25;
+  document.getElementById('porcReserva').value=5;
+  document.querySelectorAll('.meses-container input').forEach(cb=>cb.checked=false);
+});
+
+// Generar partidas
+document.getElementById('asignacionForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const partidasDiv=document.getElementById('partidasContainer'); partidasDiv.innerHTML='';
+
+  const socios=[];
+  document.querySelectorAll('.socio-entry').forEach(entry=>{
+    const nombre=entry.querySelector('.socioInput').value.trim();
+    const monto=parseFloat(entry.querySelector('.montoInput').value);
+    if(nombre && monto>0) socios.push({nombre,monto});
+  });
+  if(socios.length<1){alert("Agrega al menos 1 socio");return;}
+
+  let meses=parseInt(document.getElementById('numMeses').value);
+  if(!meses) meses=document.querySelectorAll('.meses-container input:checked').length;
+  if(!meses) meses=1;
+
+  const gananciaBruta=parseFloat(document.getElementById('gananciaBruta').value) || 0;
+const porcISR=parseFloat(document.getElementById('porcISR').value)/100 || 0;
+const porcReserva=parseFloat(document.getElementById('porcReserva').value)/100 || 0;
+
+// Cálculos seguros para que nunca salga NaN
+const isr = gananciaBruta * porcISR;
+const restanteParaReserva = gananciaBruta - isr;
+const reserva = porcReserva > 0 ? restanteParaReserva * porcReserva : 0;
+const restante = gananciaBruta - isr - reserva;
+
+  // Partida 1
+  const tabla1=document.createElement('table');
+  tabla1.innerHTML=`<tr class="partida-header"><th>Concepto</th><th>Debe</th><th>Haber</th></tr>`;
+  socios.forEach(socio=>{
+    tabla1.innerHTML+=`<tr><td class="text-left">Cuenta Asignación socio ${socio.nombre}</td><td class="text-right">${socio.monto.toFixed(2)}</td><td></td></tr>`;
+  });
+  const total1=socios.reduce((acc,s)=>acc+s.monto,0);
+  tabla1.innerHTML+=`<tr><td class="text-left">a: Caja y Bancos</td><td></td><td class="text-right">${total1.toFixed(2)}</td></tr>`;
+  tabla1.innerHTML+=`<tr><td class="text-left">Registro del retiro de efectivo del socio</td><td class="text-right">${total1.toFixed(2)}</td><td class="text-right">${total1.toFixed(2)}</td></tr>`;
+  partidasDiv.appendChild(tabla1);
+
+  // Texto repetidas
+  const repDiv=document.createElement('div');
+  repDiv.classList.add('repetidas');
+  repDiv.textContent=`⬆️Estas partidas se repiten ${meses} veces ⬆️`;
+  partidasDiv.appendChild(repDiv);
+
+  // Partida 2
+  const tabla2=document.createElement('table');
+  tabla2.innerHTML=`<tr class="partida-header"><th>Concepto</th><th>Debe</th><th>Haber</th></tr>`;
+  tabla2.innerHTML+=`<tr><td class="text-left">Ganancia antes de impuesto y reserva</td><td class="text-right">${gananciaBruta.toFixed(2)}</td><td></td></tr>`;
+  tabla2.innerHTML+=`<tr><td class="text-left">a: ISR por pagar (25%)</td><td></td><td class="text-right">${isr.toFixed(2)}</td></tr>`;
+  tabla2.innerHTML+=`<tr><td class="text-left">a: Reserva legal (5%)</td><td></td><td class="text-right">${reserva.toFixed(2)}</td></tr>`;
+  tabla2.innerHTML+=`<tr><td class="text-left">Ganancia después de ISR y reserva</td><td class="text-right">${restante.toFixed(2)}</td><td></td></tr>`;
+  tabla2.innerHTML+=`<tr><td class="text-left">Registro del cálculo de ISR, reserva y ganancia</td><td class="text-right">${gananciaBruta.toFixed(2)}</td><td class="text-right">${gananciaBruta.toFixed(2)}</td></tr>`;
+  partidasDiv.appendChild(tabla2);
+
+  // Partida 3
+  const tabla3=document.createElement('table');
+  tabla3.innerHTML=`<tr class="partida-header"><th>Concepto</th><th>Debe</th><th>Haber</th></tr>`;
+  // Debe
+  socios.forEach(socio=>{
+    tabla3.innerHTML+=`<tr><td class="text-left">Ganancia después de ISR y reserva socio ${socio.nombre}</td><td class="text-right">${restante.toFixed(2)}</td><td></td></tr>`;
+  });
+  // Haber: Cuenta Asignación
+  socios.forEach(socio=>{
+    const nombreCuenta=(socios.length>1)?`a: Cuenta Asignación socio ${socio.nombre}`:`a: Cuenta Asignación`;
+    const montoAcumulado=(socio.monto*meses).toFixed(2);
+    tabla3.innerHTML+=`<tr><td class="text-left">${nombreCuenta}</td><td></td><td class="text-right">${montoAcumulado}</td></tr>`;
+  });
+  // Haber: Caja y Bancos por socio si hay más de 1 socio
+  if(socios.length>1){
+    socios.forEach(socio=>{
+      const montoCaja=(restante - socio.monto*meses).toFixed(2);
+      tabla3.innerHTML+=`<tr><td class="text-left">a: Caja y Bancos socio ${socio.nombre}</td><td></td><td class="text-right">${montoCaja}</td></tr>`;
+    });
+  }else{
+    const montoCaja=restante - socios[0].monto*meses;
+    tabla3.innerHTML+=`<tr><td class="text-left">a: Caja y Bancos</td><td></td><td class="text-right">${montoCaja.toFixed(2)}</td></tr>`;
+  }
+  const totalDebe3=restante*socios.length;
+  const totalHaber3=restante*socios.length; 
+  tabla3.innerHTML+=`<tr><td class="text-left">Registro del pago de la ganancia al socio</td><td class="text-right">${totalDebe3.toFixed(2)}</td><td class="text-right">${totalHaber3.toFixed(2)}</td></tr>`;
+  partidasDiv.appendChild(tabla3);
+
+});
+
+// PDF
+// PDF mejorado
+document.getElementById('pdfBtn').addEventListener('click', () => {
+  const pdfBtn = document.getElementById('pdfBtn');
+  pdfBtn.disabled = true; // Desactivar botón mientras se genera
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF('p', 'pt', 'a4');
+
+  const partidas = document.getElementById('partidasContainer').cloneNode(true);
+
+  let yOffset = 20;
+
+  partidas.querySelectorAll('table').forEach(table => {
+    const headers = [];
+    const body = [];
+    // Recoger cabecera
+    table.querySelectorAll('tr').forEach((tr, i) => {
+      const row = [];
+      tr.querySelectorAll('th, td').forEach(td => row.push(td.textContent));
+      if(i===0){
+        headers.push(...row);
+      } else {
+        body.push(row);
+      }
+    });
+
+    doc.autoTable({
+      startY: yOffset,
+      head: [headers],
+      body: body,
+      theme: 'grid',
+      headStyles: {
+        fillColor: [33,150,243],
+        textColor: 255,
+        halign: 'center',
+        fontStyle: 'bold'
+      },
+      styles: {
+        fontSize: 11,
+        cellPadding: 4,
+        halign: 'right',
+        valign: 'middle',
+      },
+      columnStyles: {
+        0: {halign: 'left'}
+      },
+      didDrawCell: function (data) {
+        data.cell.styles.textColor = data.row.index === 0 ? 255 : 0;
+      }
+    });
+
+    yOffset = doc.lastAutoTable.finalY + 15; // espacio entre tablas
+  });
+
+  doc.save('partidas.pdf');
+  pdfBtn.disabled = false;
+});
+
+
+
+</script>
+</body>
+</html>
