@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cuenta de Sueldos - Contadores S.A.</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+:root {
+  --bg: #ffffff;
+  --text: #000000;
+  --accent: #00bcd4;
+  --card: #f5f9ff;
+}
+
+body.dark {
+  --bg: #000000;
+  --text: #f1f5f9;
+  --accent: #38bdf8;
+  --card: #1e293b;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  margin: 0;
+  padding: 20px;
+  transition: background 0.5s, color 0.5s;
+}
+
+h1 { text-align: center; color: var(--accent); }
+
+.container {
+  max-width: 900px;
+  margin: auto;
+  background: var(--card);
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  transition: background 0.5s, color 0.5s;
+}
+
+label { font-weight: bold; }
+input {
+  width: 100%;
+  padding: 8px;
+  margin: 8px 0 16px;
+  border: 2px solid var(--accent);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  transition: all 0.4s;
+}
+input:focus { outline: none; box-shadow: 0 0 8px var(--accent); }
+
+button {
+  background: var(--accent);
+  border: none;
+  padding: 10px 20px;
+  margin: 8px 5px;
+  border-radius: 20px;
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+  transition: transform 0.2s ease, background 0.3s ease;
+}
+button:hover { transform: scale(1.05); background: #00b3ff; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+th, td {
+  border: 1px solid var(--accent);
+  padding: 8px;
+  text-align: right;
+  transition: background 0.5s, color 0.5s;
+}
+th { background: var(--accent); color: white; }
+td:first-child { text-align: left; }
+
+#themeToggle {
+  position: fixed;
+  top: 15px;
+  right: 15px;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  border: none;
+  background: var(--accent);
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  transition: transform 0.3s ease;
+}
+#themeToggle:hover { transform: rotate(20deg) scale(1.1); }
+
+/* Fila del footer en modo claro */
+.result table tfoot td {
+  font-weight: bold;
+  background: #ffe300; /* amarillo en modo claro */
+  transition: background 0.5s;
+}
+
+/* Fila del footer en modo oscuro */
+body.dark .result table tfoot td {
+  background: #38bdf8; /* celeste oscuro o el color que quieras */
+  color: #000; /* si quieres cambiar texto también */
+}
+footer {
+  text-align: center;
+  padding: 10px;
+  border-radius: 8px 8px 0 0;
+  font-size: 14px;
+  margin-top: 30px;
+  background: var(--accent);
+  color: white;
+  transition: background 0.5s, color 0.5s;
+}
+
+/* Footer en modo oscuro */
+body.dark footer {
+  background: #38bdf8; /* celeste oscuro */
+  color: #000; /* texto negro para contraste */
+}
+
+</style>
+</head>
+<body>
+
+<button id="themeToggle">🌙</button>
+<h1>Partida 1 - Cuenta de Sueldos</h1>
+<div class="container">
+  <label>Nombre del socio:</label>
+  <input type="text" id="socio" placeholder="Ej: Juan Buch">
+
+  <label>Sueldo mensual (Q):</label>
+  <input type="number" id="sueldo" placeholder="Ej: 10000">
+
+  <button onclick="calcular()">Calcular</button>
+  <button onclick="borrar()">Borrar todo</button>
+  <button onclick="descargarPDF()">Descargar PDF</button>
+
+  <div id="resultado" class="result"></div>
+</div>
+<footer>
+  Página creada por yo?  | Derechos reservados
+</footer>
+
+<script>
+// Tema
+const toggleBtn = document.getElementById("themeToggle");
+toggleBtn.addEventListener("click", () => {
+  document.body.classList.toggle("dark");
+  toggleBtn.textContent = document.body.classList.contains("dark") ? "☀️" : "🌙";
+});
+
+// ISR anual
+function calcularISR(sueldo) {
+  if(sueldo <= 4000) return 0;
+  let ingresoAnual = sueldo*12 + 250*12;
+  let deducciones = 48000;
+  let igss = sueldo*12*0.0483;
+  let base = ingresoAnual - deducciones - igss;
+  return (base*0.05)/12;
+}
+
+// Calcular partida
+function calcular() {
+  let socio = document.getElementById("socio").value || "Socio";
+  let sueldo = parseFloat(document.getElementById("sueldo").value) || 0;
+  let bonificacion = 250;
+  let cuotaPatronal = sueldo*0.1267;
+  let igssLaboral = sueldo*0.0483;
+  let isr = calcularISR(sueldo);
+  let bancos = sueldo + bonificacion + cuotaPatronal - (cuotaPatronal + igssLaboral + isr);
+
+  let tbody = `
+    <tr><td>Cuenta sueldos "${socio}"</td><td>Q${sueldo.toFixed(2)}</td><td></td></tr>
+    <tr><td>Bonificación incentiva</td><td>Q${bonificacion.toFixed(2)}</td><td></td></tr>
+    <tr><td>Cuota patronal</td><td>Q${cuotaPatronal.toFixed(2)}</td><td></td></tr>
+    <tr><td>a: Cuota patronal por pagar</td><td></td><td>Q${cuotaPatronal.toFixed(2)}</td></tr>
+    <tr><td>a: Cuota laboral IGSS por pagar</td><td></td><td>Q${igssLaboral.toFixed(2)}</td></tr>
+    <tr><td>a: ISR por pagar</td><td></td><td>Q${isr.toFixed(2)}</td></tr>
+    <tr><td>a: Bancos</td><td></td><td>Q${bancos.toFixed(2)}</td></tr>
+  `;
+
+  let totalDebe = sueldo + bonificacion + cuotaPatronal;
+  let totalHaber = cuotaPatronal + igssLaboral + isr + bancos;
+
+  document.getElementById("resultado").innerHTML = `
+    <table>
+      <thead>
+        <tr><th>Cuenta</th><th>DEBE (Q)</th><th>HABER (Q)</th></tr>
+      </thead>
+      <tbody>${tbody}</tbody>
+      <tfoot>
+        <tr>
+          <td>Registro de la Partida de Sueldos</td>
+          <td>Q${totalDebe.toFixed(2)}</td>
+          <td>Q${totalHaber.toFixed(2)}</td>
+        </tr>
+      </tfoot>
+    </table>
+  `;
+}
+
+function borrar() {
+  document.getElementById("socio").value = "";
+  document.getElementById("sueldo").value = "";
+  document.getElementById("resultado").innerHTML = "";
+}
+
+function descargarPDF() {
+  let element = document.querySelector(".container");
+  let opt = {
+    margin: 0.5,
+    filename: 'Cuenta_Sueldos.pdf',
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, backgroundColor: null },
+    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+  };
+  html2pdf().from(element).set(opt).save();
+}
+</script>
+
+</body>
+</html>
