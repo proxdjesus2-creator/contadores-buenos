@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Distribución de Ganancias</title>
+<style>
+  :root {
+    --bg-light: linear-gradient(135deg,#e0f7fa,#ffffff);
+    --bg-dark: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+    --color-dark: #ffffff;
+    --color-btn: #0077cc;
+  }
+  html, body {
+    height: 100%;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: var(--bg-light);
+    color: #333;
+    transition: all 0.5s;
+  }
+  header {
+    background: var(--color-btn);
+    color: white;
+    padding: 20px;
+    text-align: center;
+    position: relative;
+  }
+  #darkModeBtn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    padding: 8px;
+    border:none;
+    border-radius:50%;
+    background: #00c8ff;
+    color:#fff;
+    cursor: pointer;
+    font-size: 18px;
+  }
+  main {
+    min-height: calc(100% - 140px);
+    max-width: 1000px;
+    margin: 20px auto;
+    padding: 25px;
+    background: rgba(255,255,255,0.95);
+    border-radius: 14px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    transition: all 0.5s;
+  }
+  .dark-mode html, .dark-mode body { background: var(--bg-dark); color: var(--color-dark); }
+  .dark-mode main { background: rgba(20,20,20,0.95); color: var(--color-dark); box-shadow: 0 5px 20px rgba(255,255,255,0.1); }
+  .dark-mode th { background-color: #00c8ff; color: #000; }
+  .dark-mode tr:nth-child(even) { background-color: rgba(255,255,255,0.05); }
+  h2 { text-align: center; color: #0077cc; }
+  .dark-mode h2 { color: #00c8ff; }
+  table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+  th, td { border: 1px solid #ddd; padding: 12px; text-align: center; }
+  th { background-color: #0077cc; color: white; }
+  tr:nth-child(even) { background-color: #f9f9f9; }
+  .controls { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; justify-content:center; }
+  .controls button { padding: 10px 16px; font-weight: bold; cursor: pointer; border-radius: 8px; border: none; background: #0077cc; color: white; }
+  .controls button:hover { background:#005a99; }
+  .input-group { margin: 10px 0; display: flex; gap:10px; flex-wrap: wrap; align-items: center; }
+  input[type=text], input[type=number] { padding:6px; border-radius:6px; border:1px solid #ccc; width:150px; }
+  input[type=number]:focus, input[type=text]:focus { outline:none; border:2px solid #00c8ff; }
+  @media(max-width:600px){
+    input[type=text], input[type=number] { width: 100%; }
+    .input-group { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+<header>
+<h1>Distribución de Ganancias Interactiva</h1>
+<button id="darkModeBtn" onclick="toggleDark()">🌙</button>
+</header>
+<main>
+<h2>Ingresar Datos de Socios</h2>
+<div class="input-group">
+<label for="numSocios">Número de socios:</label>
+<input type="number" id="numSocios" min="1" value="1">
+<button onclick="crearCampos()">Generar Campos</button>
+</div>
+<form id="sociosForm"></form>
+<div class="input-group" id="gananciaGroup" style="display:none;">
+<label for="gananciaTotal">Ganancia total después de ISR y reserva:</label>
+<input type="number" id="gananciaTotal" placeholder='Q'>
+</div>
+<div class="controls">
+<button onclick="calcularDistribucion()">Calcular Distribución</button>
+<button onclick="borrarTodo()">Borrar Todo</button>
+<button onclick="generarPDF()">Descargar PDF</button>
+</div>
+<div id="resultado"></div>
+</main>
+<footer style="text-align:center; margin:20px; color:#666;">pagina creada por yo? - Derechos reservados</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+function toggleDark(){ document.body.classList.toggle('dark-mode'); }
+function crearCampos(){
+  const form = document.getElementById('sociosForm'); form.innerHTML='';
+  const n = parseInt(document.getElementById('numSocios').value);
+  for(let i=1;i<=n;i++){
+    form.innerHTML += `<div class='input-group'><label>Nombre Socio ${i}:</label><input type='text' id='nombre${i}' placeholder='Nombre'><label>Capital:</label><input type='number' id='capital${i}' placeholder='Q'></div>`;
+  }
+  document.getElementById('gananciaGroup').style.display='flex';
+}
+function calcularDistribucion(){
+  const n = parseInt(document.getElementById('numSocios').value);
+  let totalCapital=0; const socios=[];
+  for(let i=1;i<=n;i++){
+    const nombre=document.getElementById(`nombre${i}`).value||`Socio ${i}`;
+    const capital=parseFloat(document.getElementById(`capital${i}`).value)||0;
+    totalCapital+=capital; socios.push({nombre,capital});
+  }
+  const gananciaTotal=parseFloat(document.getElementById('gananciaTotal').value)||0;
+  socios.forEach(s=>{ s.monto = Math.round((s.capital/totalCapital)*gananciaTotal*100)/100; });
+  let html=`<h2>Registro de la Distribución de Ganancias</h2><table><thead><tr><th>Contenido</th><th>Debe</th><th>Haber</th></tr></thead><tbody>`;
+  html+=`<tr><td>Ganancia después de ISR y reserva</td><td>Q. ${gananciaTotal.toFixed(2)}</td><td>-</td></tr>`;
+  socios.forEach(s=>{ html+=`<tr><td>A: Cuenta Beneficio ${s.nombre}</td><td>-</td><td>Q. ${s.monto.toFixed(2)}</td></tr>`; });
+  html+=`<tr><td><strong>Registro total de distribución</strong></td><td><strong>Q. ${gananciaTotal.toFixed(2)}</strong></td><td><strong>Q. ${socios.reduce((a,b)=>a+b.monto,0).toFixed(2)}</strong></td></tr></tbody></table>`;
+  document.getElementById('resultado').innerHTML=html;
+}
+function borrarTodo(){
+  document.getElementById('sociosForm').innerHTML='';
+  document.getElementById('gananciaGroup').style.display='none';
+  document.getElementById('resultado').innerHTML='';
+  document.getElementById('numSocios').value=1;
+  document.getElementById('gananciaTotal').value='';
+}
+function generarPDF(){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  const contenido = document.getElementById('resultado').innerText;
+  doc.text(contenido,10,10); doc.save('Distribucion_de_Ganancias.pdf');
+}
+</script>
+</body>
+</html>
